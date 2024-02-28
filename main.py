@@ -1,7 +1,6 @@
 from s_logger import s_dev_Log
 import RPi.GPIO as GPIO
-import time
-import s__motor as MOTOR
+import s_motor as MOTOR
 
 #Dev mode globals
 DEV_MODE = True
