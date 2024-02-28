@@ -92,7 +92,6 @@ def handle_keyboard_interrup(sig, frame):
 def main():
     if DEV_MODE:
         signal.signal(signal.SIGINT, handle_keyboard_interrup)
-        signal.pause()
     
     GPIO.add_event_detect(BUTTON_MODE, GPIO.FALLING, callback=mode_toggle, bouncetime=2000)
 
