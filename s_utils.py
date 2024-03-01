@@ -54,7 +54,7 @@ def calc_sun_rise_n_set(curr_unix_time: float, latitude: float, longitude: float
     # Calculate eplictic longtitude: LA
     # https://en.wikipedia.org/wiki/Ecliptic
     # LA is in degrees!
-    # LA_Rads is in degrees!
+    # LA_Rads is in radians!
     # 102.9372 is a constant for the "argument of perihelion."
     # Formula: LA = (M + C + 180 + 102.9372) mod 360
     LA = (M + C + 180 + 102.9372) % 360
