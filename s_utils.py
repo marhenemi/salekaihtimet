@@ -2,6 +2,7 @@
 Created: linre-90
 Time: 01.03.2024
 Updates: 
+    - 02.03.2024
 """
 from math import ceil, sin, cos, acos, radians, degrees, asin
 from datetime import datetime
@@ -14,43 +15,40 @@ def calc_sun_rise_n_set(curr_unix_time: float, latitude: float, longitude: float
     More info and implementation steps can be found from wikipedia "Complete calculation on Earth".
     https://en.wikipedia.org/wiki/Sunrise_equation
     https://en.wikipedia.org/wiki/Glossary_of_mathematical_symbols
-    \n
-    NOTE: This function is most accurate on [lat:0, long: 0]. Time errors grow depending on latitude, longitude change.
-    In finland the error is roughly in 0-15 min in 20 years span. New york and Australia time errors are somewhere around 1h.
-    \n
+    
     \nCreated: linre-90/01.03.2024
-    \nUpdated:
+    \nUpdated: linre-90/02.03.2024 - fixed bug in sun declination calculation, there was extra sin() call.
     """
     # calculate julian from unix epoch time
     # 2440587.5 is the julian value of unix jan. 1. 1970
     # 86400.0 is seconds in seconds/d 
     j_date = curr_unix_time / 86400.0 + 2440587.5
-
+    
     # Calculate number of days since Jan 1st, 2000 12:00. 
     # n is the number of days since Jan 1st, 2000 12:00.
     # Formula: n = ceil(j_date - 2451545.0 + 0.0008) 
     n = ceil(j_date - 2451545.0 + 0.0008)
-
+    
     # Calculate Julian mean solar time: j_ms
     # https://en.wikipedia.org/wiki/Solar_time#Mean_solar_time
     # In degrees!
     # Formula: n - longitude/360deg
     j_ms = n - longitude / 360
-
+    
     # Calculate solar Mean anomaly: M
     # M is in degrees!
     # M_Rads is in radians
     # Formula: M = (357.5291 + 0.98560028 * j_ms) mod 360
     M = (357.5291 + 0.98560028 * j_ms) % 360
     M_Rads = radians(M)
-
+    
     # Calculate Equation of center: C
     # https://en.wikipedia.org/wiki/Equation_of_the_center
     # This is needed to calculate next step lambda
     # C is in degrees!
     # Formula: 1.9148 * sin(M) + 0.02 * sin(2 * M) + 0.0003 * sin(3 * M)
     C = 1.9148 * sin(M_Rads) + 0.02 * sin(2 * M_Rads) + 0.0003 * sin(3 * M_Rads)
-
+    
     # Calculate eplictic longtitude: LA
     # https://en.wikipedia.org/wiki/Ecliptic
     # LA is in degrees!
@@ -59,7 +57,7 @@ def calc_sun_rise_n_set(curr_unix_time: float, latitude: float, longitude: float
     # Formula: LA = (M + C + 180 + 102.9372) mod 360
     LA = (M + C + 180 + 102.9372) % 360
     LA_Rads = radians(LA)
-
+    
     # Calculate solar transit: ST
     # ST is in degrees
     # Formula: ST= 2451545.0 + {mean solar time} + 0.0053 * sin(M) - 0.0069 * sin(2 * LA)
@@ -68,8 +66,9 @@ def calc_sun_rise_n_set(curr_unix_time: float, latitude: float, longitude: float
     # Calculate declination of the sun
     # https://en.wikipedia.org/wiki/Declination
     # DS is already a SINner
+    # Fixed bug 02.03.2024 there was extra sin taken from DS.
     # Formula: sin DS = sin LA * sin 23.4397
-    DS = sin(sin(LA_Rads) * sin(radians(23.4397)))
+    DS = sin(LA_Rads) * sin(radians(23.4397))
     
     # Calculate hour angle
     # https://en.wikipedia.org/wiki/Hour_angle
@@ -97,7 +96,6 @@ def test(name, latitude, longitude, timestamp, exp_rise, exp_set):
     result_set = datetime.fromtimestamp(times[1])
     expected_rise = datetime.strptime(exp_rise, "%H:%M")
     expected_set = datetime.strptime(exp_set, "%H:%M")
-    
     # hour difference should always be 0
     assert abs(result_rise.hour - expected_rise.hour) == 0, f"{name} failed sun rise: hour difference not zero. Difference:{abs(result_rise.hour - expected_rise.hour)}"
     assert abs(result_rise.minute - expected_rise.minute) <= 15, f"{name} failed sun rise: minute difference bigger than 15. Difference:{abs(result_rise.minute - expected_rise.minute)}"
@@ -110,6 +108,8 @@ def test(name, latitude, longitude, timestamp, exp_rise, exp_set):
 
 if __name__ == "__main__":
     print("\nRunning tests: ")
+    # Expected times are CET
+    # If tests start to fail with +- 1-2 hours the timezone thingy is propably culprit.
 
     # Vaasa [63.096, 21.61577] [lat, long]
     test("Vaasa-27.11.2015", 63.096, 21.61577, 1448601248, "9:28", "15:14")
@@ -125,8 +125,8 @@ if __name__ == "__main__":
     # Nuorgam [70.0833, 27.8500] [lat, long]
     test("Nuorgam-01.01.2024", 70.0833, 27.8500, 1704086048, "2:00", "2:00") # expected to get back unix timestamp 0 in cet 2
 
-    # Center of the world [0, 0] [lat, long]
-    test("Center-01.01.2024", 0, 0, 1704086048, "07:59", "20:07") # input time is in CET
+    # Melborne [70.0833, 27.8500] [lat, long]
+    test("Melborne-31.12.2034",-37.840935, 144.946457, 2051154848, "21:00", "11:45") # australia is 9 hours ahead... aust times "06:00", "20:45"
 
 
     print("\nAll test completed succesfully.")
