@@ -9,23 +9,18 @@ import sys
 DEV_MODE = True
 DEV_LOGGING = True
 
-# Operation mode list and initialazation
-MODE_MANUAL=11
-MODE_TIME=13
-MODE_AUTOMATIC=15
+# Operation mode pin list and initialization
+MODE_MANUAL=11 #Red
+MODE_TIME=13 #Blue
+MODE_AUTOMATIC=15 #Green
 OPERATION_MODES = [MODE_MANUAL, MODE_TIME, MODE_AUTOMATIC]
 CURRENT_OPERATION_MODE = 0
 
-# Button pin definations
+# Button pin definitions
 BUTTON_OPEN=3
 BUTTON_CLOSE=5
 BUTTON_MODE=7
 MOTOR_CHANNEL=(32,36,38,40)
-
-
-def cycle_operation_mode(currentMode: int, modes: list)->int:
-    """Cycle through development modes inside array. Returns new operation mode index."""
-    pass
 
 
 def reset()->None:
@@ -57,8 +52,12 @@ def clean_up_pins():
 
 
 def mode_toggle(channel):
+    """Cycles through the operation modes."""
     if channel == BUTTON_MODE:
         global CURRENT_OPERATION_MODE
+        #If CURRENT_OPERATION_MODE can be incremented and stay under 3,
+        #increment the variable. If not, give CURRENT_OPERATION_MODE value 0
+        #to cycle to first mode.
         if CURRENT_OPERATION_MODE + 1 <= 2:
             CURRENT_OPERATION_MODE += 1
             s_dev_Log(DEV_LOGGING, f"Mode change to {CURRENT_OPERATION_MODE}")
@@ -70,31 +69,38 @@ def mode_toggle(channel):
 
 
 def mode_light_toggle():
+    "Lights up the corresponding colored LED while changing operation modes."
     if CURRENT_OPERATION_MODE == 0:
+        #Manual mode red led
         GPIO.output(MODE_MANUAL, GPIO.HIGH)
         GPIO.output(MODE_TIME, GPIO.LOW)
         GPIO.output(MODE_AUTOMATIC, GPIO.LOW)
     if CURRENT_OPERATION_MODE == 1:
-        GPIO.output(MODE_TIME, GPIO.HIGH)
+        #Time mode blue led
         GPIO.output(MODE_MANUAL, GPIO.LOW)
+        GPIO.output(MODE_TIME, GPIO.HIGH)
         GPIO.output(MODE_AUTOMATIC, GPIO.LOW)
     if CURRENT_OPERATION_MODE == 2:
-        GPIO.output(MODE_AUTOMATIC, GPIO.HIGH)
-        GPIO.output(MODE_TIME, GPIO.LOW)
+        #Automatic mode green led
         GPIO.output(MODE_MANUAL, GPIO.LOW)
+        GPIO.output(MODE_TIME, GPIO.LOW)
+        GPIO.output(MODE_AUTOMATIC, GPIO.HIGH)
 
 
-def handle_keyboard_interrup(sig, frame):
+def handle_keyboard_interrupt(sig, frame):
+    """Assisting function for development."""
     clean_up_pins()
     sys.exit(0)
 
 
 def main():
     if DEV_MODE:
-        signal.signal(signal.SIGINT, handle_keyboard_interrup)
+        signal.signal(signal.SIGINT, handle_keyboard_interrupt)
     
     GPIO.add_event_detect(BUTTON_MODE, GPIO.FALLING, callback=mode_toggle, bouncetime=2000)
+    mode_light_toggle()
 
+    #Main program loop that selects the operation mode.
     while True:
         if CURRENT_OPERATION_MODE == 0:
             manual_mode(BUTTON_OPEN, BUTTON_CLOSE, MOTOR_CHANNEL)
