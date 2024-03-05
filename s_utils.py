@@ -93,8 +93,8 @@ def calc_sun_rise_n_set(curr_unix_time: float, latitude: float, longitude: float
 def test(name, latitude, longitude, timestamp, exp_rise, exp_set):
     times = calc_sun_rise_n_set(timestamp, latitude, longitude)
     # Allow 15 minutes movement in rise and set times
-    assert abs(times[0] - exp_rise) < 15 * 60, f"{name} failed sun rise: difference is greater thatn 15 minutes. Difference:{abs(exp_rise - times[0])}"
-    assert abs(times[1] - exp_set) < 15 * 60, f"{name} failed sun set: difference is greater thatn 15 minutes. Difference:{abs(exp_set - times[1])}"
+    assert abs(times[0] - exp_rise) < (15 * 60), f"{name} failed sun rise: difference is greater thatn 15 minutes. Difference:{abs(exp_rise - times[0])}"
+    assert abs(times[1] - exp_set) < (15 * 60), f"{name} failed sun set: difference is greater thatn 15 minutes. Difference:{abs(exp_set - times[1])}"
     print(f"\t Pass: {name}, exp_rise: {exp_rise}, diff_min_rise: {abs(exp_rise - times[0]) / 60}, exp_set:{exp_set}, diff_min_set: {abs(exp_set - times[1])/60}")
 
 
