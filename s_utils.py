@@ -92,41 +92,31 @@ def calc_sun_rise_n_set(curr_unix_time: float, latitude: float, longitude: float
 
 def test(name, latitude, longitude, timestamp, exp_rise, exp_set):
     times = calc_sun_rise_n_set(timestamp, latitude, longitude)
-    result_rise = datetime.fromtimestamp(times[0])
-    result_set = datetime.fromtimestamp(times[1])
-    expected_rise = datetime.strptime(exp_rise, "%H:%M")
-    expected_set = datetime.strptime(exp_set, "%H:%M")
-    # hour difference should always be 0
-    assert abs(result_rise.hour - expected_rise.hour) == 0, f"{name} failed sun rise: hour difference not zero. Difference:{abs(result_rise.hour - expected_rise.hour)}"
-    assert abs(result_rise.minute - expected_rise.minute) <= 15, f"{name} failed sun rise: minute difference bigger than 15. Difference:{abs(result_rise.minute - expected_rise.minute)}"
-    # allow 15 min difference in all tests
-    assert abs(expected_set.hour - result_set.hour) == 0, f"{name} failed sun set: hour difference not zero. Difference:{abs(expected_set.hour - result_set.hour)}"
-    assert abs(result_set.minute - expected_set.minute) <= 15, f"{name} failed sun set: minute difference bigger than 15. Difference:{abs(result_set.minute - expected_set.minute)}"
-
-    print(f"\t Pass: {name}, rise: {exp_rise}, diff_min: {abs(expected_rise.minute - result_rise.minute)}, set:{exp_set}, diff_min: {abs(expected_set.minute - result_set.minute)}")
+    # Allow 15 minutes movement in rise and set times
+    assert abs(times[0] - exp_rise) < 15 * 60, f"{name} failed sun rise: difference is greater thatn 15 minutes. Difference:{abs(exp_rise - times[0])}"
+    assert abs(times[1] - exp_set) < 15 * 60, f"{name} failed sun set: difference is greater thatn 15 minutes. Difference:{abs(exp_set - times[1])}"
+    print(f"\t Pass: {name}, exp_rise: {exp_rise}, diff_min_rise: {abs(exp_rise - times[0]) / 60}, exp_set:{exp_set}, diff_min_set: {abs(exp_set - times[1])/60}")
 
 
 if __name__ == "__main__":
     print("\nRunning tests: ")
-    # Expected times are CET
-    # If tests start to fail with +- 1-2 hours the timezone thingy is propably culprit.
-
+    
     # Vaasa [63.096, 21.61577] [lat, long]
-    test("Vaasa-27.11.2015", 63.096, 21.61577, 1448601248, "9:28", "15:14")
-    test("Vaasa-13.06.2017", 63.096, 21.61577, 1497327248, "3:27", "23:42")
-    test("Vaasa-01.03.2024", 63.096, 21.61577, 1709278158, "7:36", "17:57")
-    test("Vaasa-01.01.2024", 63.096, 21.61577, 1704086048, "10:10", "15:04")
-    test("Vaasa-03.05.2034", 63.096, 21.61577, 2030242448, "5:05", "21:58")
-    test("Vaasa-31.12.2034", 63.096, 21.61577, 2051154848, "10:11", "15:03")
+    test("Vaasa-27.11.2015", 63.096, 21.61577, 1448601248, 1448609280, 1448630040)
+    test("Vaasa-13.06.2017", 63.096, 21.61577, 1497327248, 1497313620, 1497386520)
+    test("Vaasa-01.03.2024", 63.096, 21.61577, 1709278158, 1709271360, 1709308620)
+    test("Vaasa-01.01.2024", 63.096, 21.61577, 1704086048, 1704096600, 1704114240)
+    test("Vaasa-03.05.2034", 63.096, 21.61577, 2030242448, 2030234700, 2030295480)
+    test("Vaasa-31.12.2034", 63.096, 21.61577, 2051154848, 2051165460, 2051182980)
 
     # Helsinki [60.192059, 21.61577] [lat, long]
-    test("Helsinki-27.11.2015", 60.192059, 24.945831, 1448601248, "8:48", "15:27")
+    test("Helsinki-27.11.2015", 60.192059, 24.945831, 1448601248, 1448606880, 1448630820)
 
     # Nuorgam [70.0833, 27.8500] [lat, long]
-    test("Nuorgam-01.01.2024", 70.0833, 27.8500, 1704086048, "2:00", "2:00") # expected to get back unix timestamp 0 in cet 2
+    test("Nuorgam-01.01.2024", 70.0833, 27.8500, 1704086048, 0, 0) # expected to get back unix timestamp 0 in cet 2
 
     # Melborne [70.0833, 27.8500] [lat, long]
-    test("Melborne-31.12.2034",-37.840935, 144.946457, 2051154848, "21:00", "11:45") # australia is 9 hours ahead... aust times "06:00", "20:45"
+    test("Melborne-31.12.2034",-37.840935, 144.946457, 2051154848, 2051118015, 2051171110) # australia is 9 hours ahead... aust times "06:00", "20:45"
 
 
     print("\nAll test completed succesfully.")
