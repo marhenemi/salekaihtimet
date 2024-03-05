@@ -27,6 +27,7 @@ def reset()->None:
     """Reset gpio, active mode and settings to default."""
     clean_up_pins()
     set_up_pins()
+    global CURRENT_OPERATION_MODE
     CURRENT_OPERATION_MODE = 0
 
 
