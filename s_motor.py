@@ -42,12 +42,12 @@ def __step_motor_step(direction: int):
         return True
     return False
 
-
+    #Opens the blinds
 def rotate_clockwise(motor_pins: tuple):
     """Rotates the motor clockwise with safety mechanics."""
     __turn_motor(1, motor_pins)
 
-
+    #Closes the blinds
 def rotate_counter_clockwise(motor_pins:tuple):
     """Rotates the motor counterclockwise with safety mechanics."""
     __turn_motor(-1, motor_pins)
