@@ -4,6 +4,9 @@ import s_motor as MOTOR
 from s_manual_mode import manual_mode
 import signal
 import sys
+import time
+from s_time_mode import update_sun_timestamps, time_mode
+from s_time import init, get_timestamp, tick
 
 #Dev mode globals
 DEV_MODE = True
@@ -100,16 +103,21 @@ def main():
     
     GPIO.add_event_detect(BUTTON_MODE, GPIO.FALLING, callback=mode_toggle, bouncetime=2000)
     mode_light_toggle()
+    
+    fps = 90
+    timestamp = init()
+    update_sun_timestamps((63.096, 21.61577), timestamp)
 
     #Main program loop that selects the operation mode.
     while True:
         if CURRENT_OPERATION_MODE == 0:
             manual_mode(BUTTON_OPEN, BUTTON_CLOSE, MOTOR_CHANNEL)
         if CURRENT_OPERATION_MODE == 1:
-            pass
+            time_mode(timestamp, (63.096, 21.61577), MOTOR_CHANNEL)
         if CURRENT_OPERATION_MODE == 2:
             pass
-        
+        tick(fps)
+        timestamp = get_timestamp(DEV_MODE, fps, timestamp)
 
 
 if __name__ == "__main__":
