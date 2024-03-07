@@ -1,4 +1,29 @@
-# Automaattiset sälekaihtimet
-Projectityö opikoodia sulautettujen järjestelmien kurssille.
+# Automatic Blinds
+Automatic Blinds is a project for an embedded software course. The blinds adjust themselves based on user actions, time, and outdoor conditions.
 
 ## Description
+The project is coded in Python (C style) and runs on Raspberry Pi 4. Users of the blinds can choose between three different operational modes:
+
+- Automatic
+- Time
+- Manual
+
+#### Automatic
+In automatic mode, the program adjusts the blind state based on time and outdoor brightness, with brightness measured using a simple resistor. This is the expected default mode, requiring very little to no user interaction.
+
+#### Time
+In time mode, blinds are adjusted based on calculated sunrise/sunset times.
+
+#### Manual
+In manual mode, the user has the option to control blinds with two different buttons. Buttons smoothly adjust blinds to open and close. No automation is applied in this operation mode.
+
+## Components
+- Raspberry Pi 4
+- 28BYJ-48 stepper motor
+- 3 buttons (mode toggling, opening, closing)
+- Light-sensitive resistor
+- 1 mF capacitor for light resistor analog input
+
+## Forward development ideas
+- Developing a mobile app to enable users to create and upload customized settings to the device would significantly enhance the flexibility and personalization of the automatic blinds system.
+- Integrating blinds into a larger system that controls electricity usage based on hourly prices can significantly enhance energy efficiency and cost savings.
