@@ -5,8 +5,9 @@ from s_manual_mode import manual_mode
 import signal
 import sys
 import time
-from s_time_mode import update_sun_timestamps, time_mode
+from s_automatic_mode import update_sun_timestamps, automatic_mode
 from s_time import init, get_timestamp, tick
+from s_user_mode import user_mode, update_close_time
 
 #Dev mode globals
 DEV_MODE = True
@@ -107,15 +108,17 @@ def main():
     fps = 90
     timestamp = init()
     update_sun_timestamps((63.096, 21.61577), timestamp)
+    update_close_time(timestamp, 18, 0, 12)
 
     #Main program loop that selects the operation mode.
     while True:
         if CURRENT_OPERATION_MODE == 0:
             manual_mode(BUTTON_OPEN, BUTTON_CLOSE, MOTOR_CHANNEL)
         if CURRENT_OPERATION_MODE == 1:
-            time_mode(timestamp, (63.096, 21.61577), MOTOR_CHANNEL)
+            user_mode(timestamp, MOTOR_CHANNEL, 18, 0, 12)
         if CURRENT_OPERATION_MODE == 2:
-            pass
+            #The blinds will be closed from 23:00-07:00 regardless of sunrise/set.
+            automatic_mode(timestamp, (63.096, 21.61577), MOTOR_CHANNEL, 21, 0, 8)
         tick(fps)
         timestamp = get_timestamp(DEV_MODE, fps, timestamp)
 
