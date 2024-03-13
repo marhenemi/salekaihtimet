@@ -163,3 +163,4 @@ cython_debug/
 .env
 devlog.txt
 .venv
+user_settings.kaihdin
