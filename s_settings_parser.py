@@ -49,7 +49,6 @@ def parse_data(data: str)->bool:
         
         # Save extracted value
         keys[key] = value
-
     __write_user_settings(keys)
     return True
 
