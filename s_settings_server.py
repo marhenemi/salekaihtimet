@@ -43,7 +43,7 @@ class ServerHandler(BaseHTTPRequestHandler):
 def wait_config_file()->bool:
     """Start server on hotspot that accepts post and get request. Returns true if user settings cannot be saved correctly."""
     try:
-        server = HTTPServer(("localhost", 8080), ServerHandler)
+        server = HTTPServer(("", 8080), ServerHandler)
         server.server_name = "curtain-123456"
         while WAIT_DATA:
             server.handle_request()
