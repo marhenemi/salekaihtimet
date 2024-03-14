@@ -90,6 +90,31 @@ def calc_sun_rise_n_set(curr_unix_time: float, latitude: float, longitude: float
         return (0, 0)
 
 
+def stamp_to_midnight(current_time: float)-> float:
+    """
+    Function receives current time stamp in unix time and converts it to
+    current date midnight time containing 0 hours, minutes and seconds.
+    """
+    midnight = current_time - current_time % 86400
+    return midnight
+
+
+def hours_to_seconds(hours: int)->int:
+    """
+    Function converts given hours to seconds
+    that are usable with unix time stamp time format.
+    """
+    return hours * 3600
+
+
+def minutes_to_seconds(minutes: int)->int:
+    """
+    Function converts given minutes to seconds that
+    are usable with unix time stamp time format.
+    """
+    return minutes * 60
+
+
 def test(name, latitude, longitude, timestamp, exp_rise, exp_set):
     times = calc_sun_rise_n_set(timestamp, latitude, longitude)
     # Allow 15 minutes movement in rise and set times
