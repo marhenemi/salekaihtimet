@@ -5,7 +5,7 @@ Updated: AT 13.3.2024
 
 import time
 import datetime
-from s_utils import calc_sun_rise_n_set
+from s_utils import calc_sun_rise_n_set, stamp_to_midnight, hours_to_seconds
 from s_time import tick, init, get_timestamp
 from s_motor import rotate_clockwise, rotate_counter_clockwise
 from s_user_mode import check_close_time, update_close_time, should_update_closetimes
@@ -24,7 +24,7 @@ def update_sun_timestamps(latitude_longitude: tuple, current_timestamp: float)->
     sunrise_sunset_timestamp = calc_sun_rise_n_set(current_timestamp, latitude_longitude[0], latitude_longitude[1])
     # Calculates next update time.
     global update_time
-    update_time = current_timestamp - (current_timestamp % 86400) + 86400 + (2 * 3600)
+    update_time = stamp_to_midnight(current_timestamp) + hours_to_seconds(2) + 86400
 
 
 def __should_update_suntimes(current_timestamp: float)->bool:
