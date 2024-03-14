@@ -32,9 +32,7 @@ def init()->float:
 
 def tick(fps:int)->None:
     """Delay/sleep execution by X milliseconds. Milliseconds are calculated with __frame_time(fps: int)->int function."""
-    #print("test 1")
     time.sleep(__frame_time(fps)/1000)
-    #print("test 2")
 
 if __name__ == "__main__":
     print("Running time module tests.\n")
