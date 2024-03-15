@@ -21,6 +21,10 @@ def parse_data(data: str)->bool:
     Extract data from data string to dict object. Writes settings to disk if parsing is succesfull.
     Sample data: close_start=22:00;close_duration=8;latitude=63.096;longitude=21.61577;
     """
+    # Check for empty
+    if data == None or len(data) == 0:
+        return False
+
     # data shape and fields
     keys = {
         "close_start": "",
