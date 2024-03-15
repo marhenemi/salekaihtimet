@@ -164,3 +164,4 @@ cython_debug/
 devlog.txt
 .venv
 user_settings.kaihdin
+s_mem.mem
