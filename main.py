@@ -6,6 +6,9 @@ import sys
 from s_automatic_mode import update_sun_timestamps, automatic_mode
 from s_time import init, get_timestamp, tick
 from s_user_mode import user_mode, update_close_time
+from s_settings_server import server_start, server_close
+from s_settings_parser import read_settings
+from s_utils import str_to_HHMM
 
 # Dev mode globals
 DEV_MODE = True
@@ -22,8 +25,12 @@ CURRENT_OPERATION_MODE = 0
 BUTTON_OPEN=3
 BUTTON_CLOSE=5
 BUTTON_MODE=7
+BUTTON_SETUP=37
 MOTOR_CHANNEL=(32,36,38,40)
 
+# Setup mode has to be tracked in here
+IS_SETUP_MODE = False
+APP_SETTINGS = None
 
 def reset()->None:
     """Reset gpio, active mode and settings to default."""
@@ -40,6 +47,7 @@ def set_up_pins():
     GPIO.setup(BUTTON_CLOSE, GPIO.IN)
     GPIO.setup(MOTOR_CHANNEL, GPIO.OUT)
     GPIO.setup(BUTTON_MODE, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(BUTTON_SETUP, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(MODE_MANUAL, GPIO.OUT)
     GPIO.setup(MODE_TIME, GPIO.OUT)
     GPIO.setup(MODE_AUTOMATIC, GPIO.OUT)
@@ -57,6 +65,8 @@ def clean_up_pins():
 def mode_toggle(channel):
     """Cycles through the operation modes."""
     if channel == BUTTON_MODE:
+        if IS_SETUP_MODE:
+            return
         global CURRENT_OPERATION_MODE
         # If CURRENT_OPERATION_MODE can be incremented and stay under 3,
         # increment the variable. If not, give CURRENT_OPERATION_MODE value 0
@@ -71,8 +81,30 @@ def mode_toggle(channel):
         mode_light_toggle()
 
 
+def setup_mode_toggle(channel):
+    """Enables settings upload mode."""
+    if channel == BUTTON_SETUP:
+        global IS_SETUP_MODE
+        if IS_SETUP_MODE: # Setup mode is active need to exit and close server
+            server_close(load_settings)
+            IS_SETUP_MODE = False
+            mode_light_toggle()
+            s_dev_Log(DEV_LOGGING, f"Exited setup mode")
+        else: # Setup mode is not active need to enable setup mode and start server
+            IS_SETUP_MODE = True
+            # set setup led indicator
+            GPIO.output(MODE_MANUAL, GPIO.HIGH)
+            GPIO.output(MODE_TIME, GPIO.LOW)
+            GPIO.output(MODE_AUTOMATIC, GPIO.HIGH)
+            # Start settings upload server on different thread
+            server_start()
+            s_dev_Log(DEV_LOGGING, f"Entered setup mode")
+
+
 def mode_light_toggle():
     "Lights up the corresponding colored LED while changing operation modes."
+    if IS_SETUP_MODE:
+        return
     if CURRENT_OPERATION_MODE == 0:
         # Manual mode red led
         GPIO.output(MODE_MANUAL, GPIO.HIGH)
@@ -93,10 +125,26 @@ def mode_light_toggle():
 def handle_keyboard_interrupt(sig, frame):
     """Assisting function for development."""
     clean_up_pins()
+    server_close(load_settings)
     sys.exit(0)
 
 
+def load_settings():
+    """Loads user settings and sets variables. If user settings does not exists loads default settings."""
+    global APP_SETTINGS
+    try:
+        APP_SETTINGS = read_settings("user_settings.kaihdin")
+        s_dev_Log(DEV_LOGGING, f"Loaded user settings.")
+    except:
+        APP_SETTINGS = read_settings("default_settings.kaihdin")
+        s_dev_Log(DEV_LOGGING, f"Loaded default settings.")
+
+
 def main():
+    # Load user or default settings
+    load_settings()
+
+    # bind ctrl+c in dev mode.
     if DEV_MODE:
         signal.signal(signal.SIGINT, handle_keyboard_interrupt)
     
@@ -104,21 +152,41 @@ def main():
     GPIO.add_event_detect(BUTTON_MODE, GPIO.FALLING, callback=mode_toggle, bouncetime=2000)
     mode_light_toggle()
     
-    fps = 90
+    # Handles the button presses for setup mode
+    GPIO.add_event_detect(BUTTON_SETUP, GPIO.FALLING, callback=setup_mode_toggle, bouncetime=2000)
+
     # Intializes the time by calling the init() function.
     timestamp = init()
-    update_sun_timestamps((63.096, 21.61577), timestamp)
-    update_close_time(timestamp, 18, 0, 12)
+    update_sun_timestamps((float(APP_SETTINGS["latitude"]), float(APP_SETTINGS["longitude"])), timestamp)
+    update_close_time(
+        timestamp, 
+        str_to_HHMM(APP_SETTINGS["close_start"])[0], 
+        str_to_HHMM(APP_SETTINGS["close_start"])[1], 
+        int(APP_SETTINGS["close_duration"]))
 
+    fps = 90
     # Main program loop that selects the operation mode.
     while True:
+        if IS_SETUP_MODE:
+            # No other operations are allowed if in setup mode.
+            continue
         if CURRENT_OPERATION_MODE == 0:
             manual_mode(BUTTON_OPEN, BUTTON_CLOSE, MOTOR_CHANNEL)
         if CURRENT_OPERATION_MODE == 1:
-            user_mode(timestamp, MOTOR_CHANNEL, 18, 0, 12)
+            user_mode(
+                timestamp, 
+                MOTOR_CHANNEL, 
+                str_to_HHMM(APP_SETTINGS["close_start"])[0], 
+                str_to_HHMM(APP_SETTINGS["close_start"])[1], 
+                int(APP_SETTINGS["close_duration"]))
         if CURRENT_OPERATION_MODE == 2:
-            # The blinds will be closed from 23:00-07:00 regardless of sunrise/set.
-            automatic_mode(timestamp, (63.096, 21.61577), MOTOR_CHANNEL, 21, 0, 8)
+            automatic_mode(
+                timestamp, 
+                (float(APP_SETTINGS["latitude"]), float(APP_SETTINGS["longitude"])), 
+                MOTOR_CHANNEL, 
+                str_to_HHMM(APP_SETTINGS["close_start"])[0], 
+                str_to_HHMM(APP_SETTINGS["close_start"])[1], 
+                int(APP_SETTINGS["close_duration"]))
         tick(fps)
         timestamp = get_timestamp(DEV_MODE, fps, timestamp)
 
