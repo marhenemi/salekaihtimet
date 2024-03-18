@@ -6,13 +6,12 @@ HOX This is not very safe...
 """
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from s_settings_parser import parse_data
-from s_logger import s_dev_Log
 from threading import Thread
 
 SERVER = None
 
 class ServerHandler(BaseHTTPRequestHandler):
-    """Class for handling GET and post request, both close server."""
+    """Class for handling web requests."""
 
     def do_POST(self):
         content_len = int(self.headers.get('Content-Length'))
@@ -37,7 +36,7 @@ def server_close(callback)->None:
 
 
 def server_start()->None:
-    """Start server on hotspot that accepts post and get request. Returns true if user settings cannot be saved correctly."""
+    """Start server on hotspot that post request."""
     global SERVER
     SERVER = HTTPServer(("", 8080), ServerHandler)
     SERVER.server_name = "curtain-123456"
