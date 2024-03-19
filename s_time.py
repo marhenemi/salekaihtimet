@@ -1,6 +1,6 @@
 """
 Created: 5.3.2024 ML + AT
-Updated: 6.3.2024 ML + AT
+Updated: 6.3.2024 ML + AT, linre-90/19.3.2024
 """
 
 import time
@@ -13,11 +13,13 @@ skip_minute = 60
 skip_hour = 3600
 speed = skip_hour
 
+@DeprecationWarning("Using deprecated funtion '__frame_time'")
 def __frame_time(fps: int)->int:
     """Function calculates how long each frame (in while -loop) lasts in milliseconds and returns it."""
     result = 1000 / fps
     return result
 
+@DeprecationWarning("Using deprecated funtion 'get_timestamp'")
 def get_timestamp(DEV_MODE: bool, fps: int, old_timestamp:float)->float:
     """Calculate new unix timestamp or if DEV_MODE == true, accelarate time so 1min == 1sec. Use __frame_time."""
     if DEV_MODE == True:
@@ -25,11 +27,13 @@ def get_timestamp(DEV_MODE: bool, fps: int, old_timestamp:float)->float:
         return dev_time
     return time.time()
 
+@DeprecationWarning("Using deprecated funtion 'init'")
 def init()->float:
     """Get and return initial time stamp in unix time."""
     current_unix_timestamp = time.time()
     return current_unix_timestamp
 
+@DeprecationWarning("Using deprecated funtion 'tick'")
 def tick(fps:int)->None:
     """Delay/sleep execution by X milliseconds. Milliseconds are calculated with __frame_time(fps: int)->int function."""
     time.sleep(__frame_time(fps)/1000)
