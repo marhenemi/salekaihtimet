@@ -1,21 +1,20 @@
 from s_logger import s_dev_Log
 import RPi.GPIO as GPIO
-import s_motor as MOTOR
 from s_manual_mode import manual_mode
 import signal
 import sys
-import time
-from s_time_mode import update_sun_timestamps, time_mode
+from s_automatic_mode import update_sun_timestamps, automatic_mode
 from s_time import init, get_timestamp, tick
+from s_user_mode import user_mode, update_close_time
 
-#Dev mode globals
+# Dev mode globals
 DEV_MODE = True
 DEV_LOGGING = True
 
 # Operation mode pin list and initialization
-MODE_MANUAL=11 #Red
-MODE_TIME=13 #Blue
-MODE_AUTOMATIC=15 #Green
+MODE_MANUAL=11 # Red
+MODE_TIME=13 # Blue
+MODE_AUTOMATIC=15 # Green
 OPERATION_MODES = [MODE_MANUAL, MODE_TIME, MODE_AUTOMATIC]
 CURRENT_OPERATION_MODE = 0
 
@@ -59,9 +58,9 @@ def mode_toggle(channel):
     """Cycles through the operation modes."""
     if channel == BUTTON_MODE:
         global CURRENT_OPERATION_MODE
-        #If CURRENT_OPERATION_MODE can be incremented and stay under 3,
-        #increment the variable. If not, give CURRENT_OPERATION_MODE value 0
-        #to cycle to first mode.
+        # If CURRENT_OPERATION_MODE can be incremented and stay under 3,
+        # increment the variable. If not, give CURRENT_OPERATION_MODE value 0
+        # to cycle back to first mode.
         if CURRENT_OPERATION_MODE + 1 <= 2:
             CURRENT_OPERATION_MODE += 1
             s_dev_Log(DEV_LOGGING, f"Mode change to {CURRENT_OPERATION_MODE}")
@@ -75,17 +74,17 @@ def mode_toggle(channel):
 def mode_light_toggle():
     "Lights up the corresponding colored LED while changing operation modes."
     if CURRENT_OPERATION_MODE == 0:
-        #Manual mode red led
+        # Manual mode red led
         GPIO.output(MODE_MANUAL, GPIO.HIGH)
         GPIO.output(MODE_TIME, GPIO.LOW)
         GPIO.output(MODE_AUTOMATIC, GPIO.LOW)
     if CURRENT_OPERATION_MODE == 1:
-        #Time mode blue led
+        # User mode blue led
         GPIO.output(MODE_MANUAL, GPIO.LOW)
         GPIO.output(MODE_TIME, GPIO.HIGH)
         GPIO.output(MODE_AUTOMATIC, GPIO.LOW)
     if CURRENT_OPERATION_MODE == 2:
-        #Automatic mode green led
+        # Automatic mode green led
         GPIO.output(MODE_MANUAL, GPIO.LOW)
         GPIO.output(MODE_TIME, GPIO.LOW)
         GPIO.output(MODE_AUTOMATIC, GPIO.HIGH)
@@ -101,21 +100,25 @@ def main():
     if DEV_MODE:
         signal.signal(signal.SIGINT, handle_keyboard_interrupt)
     
+    # Handles the button presses for the mode swap.
     GPIO.add_event_detect(BUTTON_MODE, GPIO.FALLING, callback=mode_toggle, bouncetime=2000)
     mode_light_toggle()
     
     fps = 90
+    # Intializes the time by calling the init() function.
     timestamp = init()
     update_sun_timestamps((63.096, 21.61577), timestamp)
+    update_close_time(timestamp, 18, 0, 12)
 
-    #Main program loop that selects the operation mode.
+    # Main program loop that selects the operation mode.
     while True:
         if CURRENT_OPERATION_MODE == 0:
             manual_mode(BUTTON_OPEN, BUTTON_CLOSE, MOTOR_CHANNEL)
         if CURRENT_OPERATION_MODE == 1:
-            time_mode(timestamp, (63.096, 21.61577), MOTOR_CHANNEL)
+            user_mode(timestamp, MOTOR_CHANNEL, 18, 0, 12)
         if CURRENT_OPERATION_MODE == 2:
-            pass
+            # The blinds will be closed from 23:00-07:00 regardless of sunrise/set.
+            automatic_mode(timestamp, (63.096, 21.61577), MOTOR_CHANNEL, 21, 0, 8)
         tick(fps)
         timestamp = get_timestamp(DEV_MODE, fps, timestamp)
 

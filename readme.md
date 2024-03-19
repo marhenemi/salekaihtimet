@@ -1,5 +1,6 @@
 # Automatic Blinds
 Automatic Blinds is a project for an embedded software course. The blinds adjust themselves based on user actions, time, and outdoor conditions.
+Blinds are partially controlled with Android application found in the following repository: https://github.com/linre-90/SalekaihtimetApp  
 
 ## Description
 The project is coded in Python (C style) and runs on Raspberry Pi 4. Users of the blinds can choose between three different operational modes:
