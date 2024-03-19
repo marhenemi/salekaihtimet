@@ -4,11 +4,11 @@ from s_manual_mode import manual_mode
 import signal
 import sys
 from s_automatic_mode import update_sun_timestamps, automatic_mode
-from s_time import init, get_timestamp, tick
 from s_user_mode import user_mode, update_close_time
 from s_settings_server import server_start, server_close
 from s_settings_parser import read_settings
 from s_utils import str_to_HHMM
+from s_clock import clock_init, clock_run, clock_stamp, clock_update_time, T_SCALE_1000X
 
 # Dev mode globals
 DEV_MODE = True
@@ -156,7 +156,7 @@ def main():
     GPIO.add_event_detect(BUTTON_SETUP, GPIO.FALLING, callback=setup_mode_toggle, bouncetime=2000)
 
     # Intializes the time by calling the init() function.
-    timestamp = init()
+    timestamp = clock_init()
     update_sun_timestamps((float(APP_SETTINGS["latitude"]), float(APP_SETTINGS["longitude"])), timestamp)
     update_close_time(
         timestamp, 
@@ -164,9 +164,11 @@ def main():
         str_to_HHMM(APP_SETTINGS["close_start"])[1], 
         int(APP_SETTINGS["close_duration"]))
 
-    fps = 90
     # Main program loop that selects the operation mode.
     while True:
+
+        t_start = clock_stamp()
+
         if IS_SETUP_MODE:
             # No other operations are allowed if in setup mode.
             continue
@@ -187,8 +189,9 @@ def main():
                 str_to_HHMM(APP_SETTINGS["close_start"])[0], 
                 str_to_HHMM(APP_SETTINGS["close_start"])[1], 
                 int(APP_SETTINGS["close_duration"]))
-        tick(fps)
-        timestamp = get_timestamp(DEV_MODE, fps, timestamp)
+        clock_run(DEV_MODE)
+        t_end = clock_stamp()
+        timestamp = clock_update_time(timestamp, DEV_MODE, (t_end - t_start).microseconds, T_SCALE_1000X)
 
 
 if __name__ == "__main__":

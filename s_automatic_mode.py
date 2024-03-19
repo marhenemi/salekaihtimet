@@ -3,10 +3,8 @@ Created: ML + AT 6.3.2024
 Updated: AT 13.3.2024
 """
 
-import time
 import datetime
 from s_utils import calc_sun_rise_n_set, stamp_to_midnight, hours_to_seconds
-from s_time import tick, init, get_timestamp
 from s_motor import rotate_clockwise, rotate_counter_clockwise
 from s_user_mode import check_close_time, update_close_time, should_update_closetimes
 
@@ -60,15 +58,15 @@ def automatic_mode(current_timestamp: float, latitude_longitude: tuple, motor_pi
         update_close_time(current_timestamp, close_time_hours, close_time_minutes, closed_duration)
 
 
-if __name__ == "__main__":
-    #Vaasa coordinates
-    update_sun_timestamps((63.096, 21.61577), time.time())
+# if __name__ == "__main__":
+#     #Vaasa coordinates
+#     update_sun_timestamps((63.096, 21.61577), time.time())
 
-    test_time = init()
-    while True:
-        tick(1)
-        test_time = get_timestamp(True,1,test_time)
-        print(datetime.datetime.fromtimestamp(test_time))
-        if __should_update_suntimes(test_time):
-            print("New suntimes calculated.")
-            update_sun_timestamps((63.096, 21.61577), test_time)
+#     test_time = init()
+#     while True:
+#         tick(1)
+#         test_time = get_timestamp(True,1,test_time)
+#         print(datetime.datetime.fromtimestamp(test_time))
+#         if __should_update_suntimes(test_time):
+#             print("New suntimes calculated.")
+#             update_sun_timestamps((63.096, 21.61577), test_time)
