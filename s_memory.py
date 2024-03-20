@@ -48,7 +48,10 @@ def __read_mem_file(current_timestamp: float):
 
 
 def init_memory(adjust_interval: int, snapshot_interval: int, current_timestamp: float)->None:
-    """Initialize memory module. 'Adjust_interval' is passed in as minutes, 'snapshot_interval' is passed in as seconds."""
+    """Initialize memory module. 
+    'Adjust_interval' is interval when motor adjusts, passed in as minutes. 
+    'snapshot_interval' is passed in as seconds.
+    """
     # Set max len
     global MEMQ_LEN
     MEMQ_LEN = int(minutes_to_seconds(adjust_interval) / snapshot_interval)

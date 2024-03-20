@@ -13,6 +13,7 @@ from s_user_mode import check_close_time, update_close_time, should_update_close
 sunrise_sunset_timestamp = []
 update_time = 0
 
+#NOTE initialize memory
 
 
 def update_sun_timestamps(latitude_longitude: tuple, current_timestamp: float)->None:
@@ -39,6 +40,13 @@ def __adjust_motor(current_timestamp: float, motor_pins: tuple)->None:
     if not check_close_time(current_timestamp):
         # Statement is entered when current_timestamp is between current sunrise and -set times.
         if sunrise_sunset_timestamp[0] < current_timestamp < sunrise_sunset_timestamp[1]:
+            #NOTE use sensor and memory here
+            #NOTE receive mem update time from automatic_mode
+            #NOTE receive motor adjust time from automatic_mode
+
+            # if mem update time -> insert new brightness value to memory.
+            # if motor adjust time get average from memory and adjust motor.
+
             rotate_clockwise(motor_pins)
             print("inside sunrise/set")
             return
@@ -47,6 +55,9 @@ def __adjust_motor(current_timestamp: float, motor_pins: tuple)->None:
 
 def automatic_mode(current_timestamp: float, latitude_longitude: tuple, motor_pins: tuple, close_time_hours: int, close_time_minutes: int, closed_duration: int)->None:
     """Run in automatic mode. Takes in frames and current time."""
+    #NOTE receive mem update time from main
+    #NOTE receive motor adjust time from main
+    
     __adjust_motor(current_timestamp, motor_pins)
     print(datetime.datetime.fromtimestamp(current_timestamp))
     # Determine whether to use morning timestamp or evening timestamp based on current time

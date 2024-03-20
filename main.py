@@ -27,6 +27,7 @@ BUTTON_CLOSE=5
 BUTTON_MODE=7
 BUTTON_SETUP=37
 MOTOR_CHANNEL=(32,36,38,40)
+LIGHT_SENSOR=19
 
 # Setup mode has to be tracked in here
 IS_SETUP_MODE = False
@@ -162,7 +163,11 @@ def main():
         timestamp, 
         str_to_HHMM(APP_SETTINGS["close_start"])[0], 
         str_to_HHMM(APP_SETTINGS["close_start"])[1], 
-        int(APP_SETTINGS["close_duration"]))
+        int(APP_SETTINGS["close_duration"])
+    )
+    
+    #NOTE track mem update time
+    #NOTE track motor adjust interval
 
     # Main program loop that selects the operation mode.
     while True:
@@ -180,7 +185,8 @@ def main():
                 MOTOR_CHANNEL, 
                 str_to_HHMM(APP_SETTINGS["close_start"])[0], 
                 str_to_HHMM(APP_SETTINGS["close_start"])[1], 
-                int(APP_SETTINGS["close_duration"]))
+                int(APP_SETTINGS["close_duration"])
+            )
         if CURRENT_OPERATION_MODE == 2:
             automatic_mode(
                 timestamp, 
@@ -188,10 +194,12 @@ def main():
                 MOTOR_CHANNEL, 
                 str_to_HHMM(APP_SETTINGS["close_start"])[0], 
                 str_to_HHMM(APP_SETTINGS["close_start"])[1], 
-                int(APP_SETTINGS["close_duration"]))
+                int(APP_SETTINGS["close_duration"])
+            )
         clock_run(DEV_MODE)
         t_end = clock_stamp()
         timestamp = clock_update_time(timestamp, DEV_MODE, (t_end - t_start).microseconds, T_SCALE_1000X)
+        #NOTE update mem and motor adjust times if current time > adjust time
 
 
 if __name__ == "__main__":
