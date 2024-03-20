@@ -3,10 +3,8 @@ Created: ML + AT 6.3.2024
 Updated: AT 13.3.2024
 """
 
-import time
 import datetime
 from s_utils import calc_sun_rise_n_set, stamp_to_midnight, hours_to_seconds
-from s_time import tick, init, get_timestamp
 from s_motor import rotate_clockwise, rotate_counter_clockwise
 from s_user_mode import check_close_time, update_close_time, should_update_closetimes
 
@@ -15,6 +13,7 @@ from s_user_mode import check_close_time, update_close_time, should_update_close
 sunrise_sunset_timestamp = []
 update_time = 0
 
+#NOTE initialize memory
 
 
 def update_sun_timestamps(latitude_longitude: tuple, current_timestamp: float)->None:
@@ -41,6 +40,13 @@ def __adjust_motor(current_timestamp: float, motor_pins: tuple)->None:
     if not check_close_time(current_timestamp):
         # Statement is entered when current_timestamp is between current sunrise and -set times.
         if sunrise_sunset_timestamp[0] < current_timestamp < sunrise_sunset_timestamp[1]:
+            #NOTE use sensor and memory here
+            #NOTE receive mem update time from automatic_mode
+            #NOTE receive motor adjust time from automatic_mode
+
+            # if mem update time -> insert new brightness value to memory.
+            # if motor adjust time get average from memory and adjust motor.
+
             rotate_clockwise(motor_pins)
             print("inside sunrise/set")
             return
@@ -49,6 +55,9 @@ def __adjust_motor(current_timestamp: float, motor_pins: tuple)->None:
 
 def automatic_mode(current_timestamp: float, latitude_longitude: tuple, motor_pins: tuple, close_time_hours: int, close_time_minutes: int, closed_duration: int)->None:
     """Run in automatic mode. Takes in frames and current time."""
+    #NOTE receive mem update time from main
+    #NOTE receive motor adjust time from main
+    
     __adjust_motor(current_timestamp, motor_pins)
     print(datetime.datetime.fromtimestamp(current_timestamp))
     # Determine whether to use morning timestamp or evening timestamp based on current time
@@ -60,15 +69,15 @@ def automatic_mode(current_timestamp: float, latitude_longitude: tuple, motor_pi
         update_close_time(current_timestamp, close_time_hours, close_time_minutes, closed_duration)
 
 
-if __name__ == "__main__":
-    #Vaasa coordinates
-    update_sun_timestamps((63.096, 21.61577), time.time())
+# if __name__ == "__main__":
+#     #Vaasa coordinates
+#     update_sun_timestamps((63.096, 21.61577), time.time())
 
-    test_time = init()
-    while True:
-        tick(1)
-        test_time = get_timestamp(True,1,test_time)
-        print(datetime.datetime.fromtimestamp(test_time))
-        if __should_update_suntimes(test_time):
-            print("New suntimes calculated.")
-            update_sun_timestamps((63.096, 21.61577), test_time)
+#     test_time = init()
+#     while True:
+#         tick(1)
+#         test_time = get_timestamp(True,1,test_time)
+#         print(datetime.datetime.fromtimestamp(test_time))
+#         if __should_update_suntimes(test_time):
+#             print("New suntimes calculated.")
+#             update_sun_timestamps((63.096, 21.61577), test_time)

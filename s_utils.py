@@ -3,6 +3,7 @@ Created: linre-90
 Time: 01.03.2024
 Updates: 
     - 02.03.2024
+    - 18.03.2024 "Added str_to_HHMM" function
 """
 from math import ceil, sin, cos, acos, radians, degrees, asin
 from datetime import datetime
@@ -113,6 +114,12 @@ def minutes_to_seconds(minutes: int)->int:
     are usable with unix time stamp time format.
     """
     return minutes * 60
+
+
+def str_to_HHMM(time: str)->tuple[int, int]:
+    """Parse 'HH:MM' string to tuple of hours and minutes."""
+    hours_mins = time.split(":")
+    return((int(hours_mins[0]), int(hours_mins[1])))
 
 
 def test(name, latitude, longitude, timestamp, exp_rise, exp_set):
