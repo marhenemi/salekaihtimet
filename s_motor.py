@@ -76,3 +76,17 @@ def __turn_motor(direction: int, motor_pins:tuple):
     GPIO.output(motor_pins[2], GPIO.LOW)
     GPIO.output(motor_pins[3], GPIO.LOW)
 
+def turn_motor_percentage(motor_pins:tuple, percentage:int):
+    target_steps = int(__motor_min_max_steps[1] * (percentage / 100))
+    target_steps = target_steps - (target_steps % 8)
+    if target_steps == __step_counter:
+        return
+    if target_steps > __step_counter:
+        while target_steps != __step_counter:
+            rotate_clockwise(motor_pins)
+            print("inside motor rotate")
+        return
+    if target_steps < __step_counter:
+        while target_steps != __step_counter:
+            rotate_counter_clockwise(motor_pins)
+            print("inside motor rotate")

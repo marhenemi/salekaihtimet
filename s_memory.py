@@ -8,7 +8,7 @@ from s_utils import minutes_to_seconds
 
 
 MEM_QUE = deque([]) # Memory
-MEMQ_LEN = 50 # How amany entries memory module can remember.
+MEMQ_LEN = 50 # How many entries memory module can remember.
 
 
 class MemFsFormat():
