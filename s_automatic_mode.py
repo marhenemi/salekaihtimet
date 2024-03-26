@@ -73,9 +73,9 @@ def __adjust_motor(current_timestamp: float, motor_pins: tuple)->None:
                 s_dev_Log(True, f"time: {current_timestamp}, mem_average:{sensor_average}")
                 turn_motor_percentage(motor_pins, sensor_average)
                 adjust_time = current_timestamp + snapshot_adjust_interval[1]
-        
+            return
         # Further development feature
-        # rotate_clockwise(motor_pins)
+        rotate_clockwise(motor_pins)
         return
     rotate_counter_clockwise(motor_pins)
 
