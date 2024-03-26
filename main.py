@@ -1,4 +1,4 @@
-from s_logger import s_dev_Log
+from s_logger import s_dev_Log, s_dev_Log_time
 import RPi.GPIO as GPIO
 from s_manual_mode import manual_mode
 import signal
@@ -198,6 +198,7 @@ def main():
         clock_run(DEV_MODE)
         t_end = clock_stamp()
         timestamp = clock_update_time(timestamp, DEV_MODE, (t_end - t_start).microseconds, T_SCALE_5X)
+        s_dev_Log_time(DEV_LOGGING, timestamp)
 
 
 if __name__ == "__main__":

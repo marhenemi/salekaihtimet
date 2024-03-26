@@ -47,6 +47,7 @@ def rotate_clockwise(motor_pins: tuple):
     """Rotates the motor clockwise with safety mechanics."""
     __turn_motor(1, motor_pins)
 
+
     #Closes the blinds
 def rotate_counter_clockwise(motor_pins:tuple):
     """Rotates the motor counterclockwise with safety mechanics."""
@@ -84,9 +85,7 @@ def turn_motor_percentage(motor_pins:tuple, percentage:int):
     if target_steps > __step_counter:
         while target_steps != __step_counter:
             rotate_clockwise(motor_pins)
-            print("inside motor rotate")
         return
     if target_steps < __step_counter:
         while target_steps != __step_counter:
             rotate_counter_clockwise(motor_pins)
-            print("inside motor rotate")

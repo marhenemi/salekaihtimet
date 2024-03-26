@@ -11,6 +11,7 @@ from s_user_mode import check_close_time, update_close_time, should_update_close
 from s_memory import init_memory, read_mem_average, use_memory, is_memory_hydrated
 from s_light_sensor import sensor_read_single_value, sensor_val_to_percentage
 from s_motor import turn_motor_percentage
+from s_logger import s_dev_Log
 
 # List index 0 == rise, 1 == set
 sunrise_sunset_timestamp = []
@@ -18,8 +19,6 @@ update_time = 0
 adjust_time = 0
 snapshot_time = 0
 snapshot_adjust_interval = [-1,-1]
-
-#NOTE initialize memory
 
 
 def automatic_init(adjust_interval, snapshot_interval, current_timestamp):
@@ -29,9 +28,9 @@ def automatic_init(adjust_interval, snapshot_interval, current_timestamp):
     """
     init_memory(adjust_interval, snapshot_interval, current_timestamp)
     global adjust_time 
-    adjust_time = current_timestamp + minutes_to_seconds(adjust_interval)
+    adjust_time = current_timestamp
     global snapshot_time
-    snapshot_time = current_timestamp + snapshot_interval
+    snapshot_time = current_timestamp
     global snapshot_adjust_interval
     snapshot_adjust_interval[0] = snapshot_interval
     snapshot_adjust_interval[1] = minutes_to_seconds(adjust_interval)
@@ -60,10 +59,7 @@ def __adjust_motor(current_timestamp: float, motor_pins: tuple)->None:
     # Statement is entered when check_close_time returns False.
     if not check_close_time(current_timestamp):
         # Statement is entered when current_timestamp is between current sunrise and -set times.
-        #print(datetime.datetime.fromtimestamp(sunrise_sunset_timestamp[0]))
-        #print(datetime.datetime.fromtimestamp(sunrise_sunset_timestamp[1]))
         if sunrise_sunset_timestamp[0] < current_timestamp < sunrise_sunset_timestamp[1]:
-            print("Inside check_close_time")
             # if mem update time -> insert new brightness value to memory.
             global snapshot_time
             if current_timestamp > snapshot_time:
@@ -74,6 +70,7 @@ def __adjust_motor(current_timestamp: float, motor_pins: tuple)->None:
             if current_timestamp > adjust_time and is_memory_hydrated():
                 # if motor adjust time get average from memory and adjust motor.
                 sensor_average = read_mem_average()
+                s_dev_Log(True, f"time: {current_timestamp}, mem_average:{sensor_average}")
                 turn_motor_percentage(motor_pins, sensor_average)
                 adjust_time = current_timestamp + snapshot_adjust_interval[1]
         
@@ -87,7 +84,6 @@ def automatic_mode(current_timestamp: float, latitude_longitude: tuple, motor_pi
     """Run in automatic mode. Takes in frames and current time."""
     
     __adjust_motor(current_timestamp, motor_pins)
-    #print(datetime.datetime.fromtimestamp(current_timestamp))
     # Determine whether to use morning timestamp or evening timestamp based on current time
     # Rotate motor open or close, motor has limit that it cannot go over boundaries and motor functions return early if it cannot rotate.
     # Last check is __should_update_suntimes() return early if no update needed
@@ -95,17 +91,3 @@ def automatic_mode(current_timestamp: float, latitude_longitude: tuple, motor_pi
         update_sun_timestamps(latitude_longitude, current_timestamp)
     if should_update_closetimes(current_timestamp):
         update_close_time(current_timestamp, close_time_hours, close_time_minutes, closed_duration)
-
-
-# if __name__ == "__main__":
-#     #Vaasa coordinates
-#     update_sun_timestamps((63.096, 21.61577), time.time())
-
-#     test_time = init()
-#     while True:
-#         tick(1)
-#         test_time = get_timestamp(True,1,test_time)
-#         print(datetime.datetime.fromtimestamp(test_time))
-#         if __should_update_suntimes(test_time):
-#             print("New suntimes calculated.")
-#             update_sun_timestamps((63.096, 21.61577), test_time)

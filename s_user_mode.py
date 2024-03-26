@@ -47,7 +47,6 @@ def __adjust_motor(current_timestamp: float, motor_pins: tuple)->None:
     # Statement is entered when check_close_time return False.
     if not check_close_time(current_timestamp):
             rotate_clockwise(motor_pins)
-            print("daytime, blinds open")
             return
     rotate_counter_clockwise(motor_pins)
 
@@ -55,7 +54,6 @@ def __adjust_motor(current_timestamp: float, motor_pins: tuple)->None:
 def user_mode(current_timestamp: float, motor_pins: tuple, close_time_hours: int, close_time_minutes: int, closed_duration: int)->None:
     """Run in user mode. Takes in current time, user given close time in hours and minutes, and closed duration."""
     __adjust_motor(current_timestamp, motor_pins)
-    print(datetime.datetime.fromtimestamp(current_timestamp))
 
     # Checks if new closing/opening times need to be calculated.
     if should_update_closetimes(current_timestamp):

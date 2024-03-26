@@ -43,8 +43,7 @@ def __read_mem_file(current_timestamp: float):
                 return memFileContent.data
             return None
     except Exception as e:
-        print(e)
-        pass # Does not matter what is wrong don't use file contents
+        return None # Does not matter what is wrong don't use file contents
 
 
 def init_memory(adjust_interval: int, snapshot_interval: int, current_timestamp: float)->None:
