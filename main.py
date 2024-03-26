@@ -8,7 +8,7 @@ from s_user_mode import user_mode, update_close_time
 from s_settings_server import server_start, server_close
 from s_settings_parser import read_settings
 from s_utils import str_to_HHMM
-from s_clock import clock_init, clock_run, clock_stamp, clock_update_time, T_SCALE_5X
+from s_clock import clock_init, clock_run, clock_stamp, clock_update_time, T_SCALE_100X
 
 # Dev mode globals
 DEV_MODE = True
@@ -197,7 +197,7 @@ def main():
             )
         clock_run(DEV_MODE)
         t_end = clock_stamp()
-        timestamp = clock_update_time(timestamp, DEV_MODE, (t_end - t_start).microseconds, T_SCALE_5X)
+        timestamp = clock_update_time(timestamp, DEV_MODE, (t_end - t_start).microseconds, T_SCALE_100X)
         s_dev_Log_time(DEV_LOGGING, timestamp)
 
 
