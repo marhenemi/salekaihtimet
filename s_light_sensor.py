@@ -3,6 +3,7 @@
 import time
 import RPi.GPIO as GPIO
 from math import floor
+from s_logger import s_dev_Log
 
 
 # found min with phone flashlight(max brightness) = 10
@@ -32,6 +33,7 @@ def sensor_read_single_value(pin)->int:
         return 14
     if count > RANGE_MAX:
         return 51900
+    s_dev_Log(True, f"time:{time.time()}, sensor_snapshot_value: {count}")
     return count
 
 

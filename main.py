@@ -1,14 +1,14 @@
-from s_logger import s_dev_Log
+from s_logger import s_dev_Log, s_dev_Log_time
 import RPi.GPIO as GPIO
 from s_manual_mode import manual_mode
 import signal
 import sys
-from s_automatic_mode import update_sun_timestamps, automatic_mode
+from s_automatic_mode import update_sun_timestamps, automatic_mode, automatic_init
 from s_user_mode import user_mode, update_close_time
 from s_settings_server import server_start, server_close
 from s_settings_parser import read_settings
 from s_utils import str_to_HHMM
-from s_clock import clock_init, clock_run, clock_stamp, clock_update_time, T_SCALE_1000X
+from s_clock import clock_init, clock_run, clock_stamp, clock_update_time, T_SCALE_100X
 
 # Dev mode globals
 DEV_MODE = True
@@ -165,9 +165,8 @@ def main():
         str_to_HHMM(APP_SETTINGS["close_start"])[1], 
         int(APP_SETTINGS["close_duration"])
     )
-    
-    #NOTE track mem update time
-    #NOTE track motor adjust interval
+
+    automatic_init(5, 6, timestamp)
 
     # Main program loop that selects the operation mode.
     while True:
@@ -198,8 +197,8 @@ def main():
             )
         clock_run(DEV_MODE)
         t_end = clock_stamp()
-        timestamp = clock_update_time(timestamp, DEV_MODE, (t_end - t_start).microseconds, T_SCALE_1000X)
-        #NOTE update mem and motor adjust times if current time > adjust time
+        timestamp = clock_update_time(timestamp, DEV_MODE, (t_end - t_start).microseconds, T_SCALE_100X)
+        s_dev_Log_time(DEV_LOGGING, timestamp)
 
 
 if __name__ == "__main__":
