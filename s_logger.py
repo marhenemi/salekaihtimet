@@ -1,3 +1,8 @@
+"""
+Created: linre-90/26.02.2024
+Updated: linre-90/25.03.2024
+"""
+
 from datetime import datetime
 import time
 from s_utils import minutes_to_seconds
