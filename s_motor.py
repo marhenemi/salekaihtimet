@@ -1,3 +1,8 @@
+"""
+Created: AT + linre-90/n.03.2024
+Updated:
+"""
+
 import RPi.GPIO as GPIO
 import time
 from copy import deepcopy
