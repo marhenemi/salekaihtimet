@@ -21,10 +21,6 @@ In manual mode, the user has the option to control blinds with two different but
 ## Components
 - Raspberry Pi 4
 - 28BYJ-48 stepper motor
-- 3 buttons (mode toggling, opening, closing)
+- 4 buttons (setup, mode toggling, opening, closing)
 - Light-sensitive resistor
 - 1 mF capacitor for light resistor analog input
-
-## Forward development ideas
-- Developing a mobile app to enable users to create and upload customized settings to the device would significantly enhance the flexibility and personalization of the automatic blinds system.
-- Integrating blinds into a larger system that controls electricity usage based on hourly prices can significantly enhance energy efficiency and cost savings.
