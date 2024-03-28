@@ -1,3 +1,8 @@
+"""
+Created: ML + AT + linre-90/1.03.2024
+Updated: 
+"""
+
 import RPi.GPIO as GPIO
 import s_motor as MOTOR
 
