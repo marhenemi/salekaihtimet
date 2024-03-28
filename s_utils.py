@@ -1,9 +1,8 @@
 """
-Created: linre-90
-Time: 01.03.2024
-Updates: 
-    - 02.03.2024
-    - 18.03.2024 "Added str_to_HHMM" function
+Created: linre-90 / 01.03.2024
+Updated: 
+    - AT / 02.03.2024 / Created time conversion functions
+    - linre-90 / 18.03.2024 / Added str_to_HHMM function
 """
 from math import ceil, sin, cos, acos, radians, degrees, asin
 from datetime import datetime
