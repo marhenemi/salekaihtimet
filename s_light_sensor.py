@@ -1,5 +1,8 @@
+"""
+Created: ML + linre-90/20.03.2024
+Updated:
+"""
 
-#from gpiozero import LightSensor
 import time
 import RPi.GPIO as GPIO
 from math import floor
