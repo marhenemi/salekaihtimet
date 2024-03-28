@@ -1,3 +1,7 @@
+"""
+Created: AT + ML + linre-90
+Updated: AT + ML + linre-90 / 26.03.2024
+"""
 from s_logger import s_dev_Log, s_dev_Log_time
 import RPi.GPIO as GPIO
 from s_manual_mode import manual_mode
