@@ -24,3 +24,11 @@ In manual mode, the user has the option to control blinds with two different but
 - 4 buttons (setup, mode toggling, opening, closing)
 - Light-sensitive resistor
 - 1 mF capacitor for light resistor analog input
+
+# Personal evaluation on finnish line
+The project was successful, and it provided us with valuable learning experiences in coding practices, Git usage, and teamwork. Reflecting on the codebase, I (linre-90) have several suggestions for improvement:
+- Utilizing more classes to encapsulate individual data types, allowing for the passing of a single class object to functions instead of multiple parameters.
+- Encapsulating global variables within classes, where initialization functions return the state or handle to the module, which is a pointer to a class instance.
+- Implementing better naming conventions for variables and functions to enhance readability, including tying function names to their respective modules.
+- Rewriting unit tests to ensure comprehensive coverage and accuracy.
+- Addressing memory usage optimizations to enhance efficiency.
